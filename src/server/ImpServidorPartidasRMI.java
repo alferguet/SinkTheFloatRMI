@@ -2,10 +2,17 @@ package server;
 
 import common.IntServidorPartidasRMI;
 
-public class ImpServidorPartidasRMI implements IntServidorPartidasRMI {
+import java.rmi.RemoteException;
+import java.rmi.server.UnicastRemoteObject;
+
+public class ImpServidorPartidasRMI extends UnicastRemoteObject implements IntServidorPartidasRMI {
 
 
     Partida partida;
+
+    ImpServidorPartidasRMI() throws RemoteException {
+        super();
+    }
 
     @Override
     public void nuevaPartida(int nf, int nc, int nb) {

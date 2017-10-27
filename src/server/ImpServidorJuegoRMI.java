@@ -4,9 +4,14 @@ import common.IntServidorJuegoRMI;
 import common.IntServidorPartidasRMI;
 
 import java.rmi.RemoteException;
+import java.rmi.server.UnicastRemoteObject;
 
-public class ImpServidorJuegoRMI implements IntServidorJuegoRMI{
+public class ImpServidorJuegoRMI extends UnicastRemoteObject implements IntServidorJuegoRMI{
 
+
+    ImpServidorJuegoRMI() throws RemoteException {
+        super();
+    }
 
     @Override
     public IntServidorPartidasRMI nuevoServidorPartidas() throws RemoteException {

@@ -5,7 +5,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.rmi.*;
 
-import common.HelloInterface;
 import common.IntServidorJuegoRMI;
 import common.IntServidorPartidasRMI;
 
