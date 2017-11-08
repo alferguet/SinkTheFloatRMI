@@ -25,7 +25,6 @@ public interface IntServidorJuegoRMI extends Remote {
    /**
  	 * Permite a un cliente/jugador eliminar su registro para callback
  	 * @param	nombreJugador			nombre del jugador que propuso la partida
- 	 * @param	callbackClientObject	referencia al objeto del jugador a eliminar
  	 * @return							valor logico indicando si se ha podido eliminar el jugador del registro
  	 * @throws	RemoteException
  	 */
