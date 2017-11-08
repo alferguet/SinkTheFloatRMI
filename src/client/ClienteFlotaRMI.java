@@ -4,6 +4,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.rmi.*;
+import java.util.Scanner;
 
 import common.IntServidorJuegoRMI;
 import common.IntServidorPartidasRMI;
@@ -14,7 +15,7 @@ import javax.swing.*;
 public class ClienteFlotaRMI {
 
     public static final int NUMFILAS = 8, NUMCOLUMNAS = 8, NUMBARCOS = 6;
-
+    private String USERNAME;
     private int quedan = NUMBARCOS, disparos = 0;
 
     private GuiTablero guiTablero = null;
@@ -30,6 +31,9 @@ public class ClienteFlotaRMI {
         try {
             // start a security manager - this is needed if stub
             // downloading is in use for this application.
+            Scanner input = new Scanner(System.in);
+            System.out.println("Escriba su nombre de usuario");
+            USERNAME = input.next();
             System.setSecurityManager(new SecurityManager());
 
             String registryURL = "rmi://localhost:1099/sinkthefloat";
@@ -193,7 +197,12 @@ public class ClienteFlotaRMI {
             // Colorea casillas a mar y despues comprueba el id de cada casilla para pintarlo
             for (int i = 0; i < numFilas; i++) {
                 for (int j = 0; j < numColumnas; j++) {
-                    int casillaId = partida.pruebaCasilla(i, j);
+                    int casillaId = 0;
+                    try {
+                        casillaId = partida.pruebaCasilla(i, j);
+                    } catch (RemoteException e) {
+                        e.printStackTrace();
+                    }
                     if (casillaId == -1)
                         guiTablero.pintaBoton(buttons[i][j], Color.CYAN);
                     else if (casillaId == -2)
@@ -291,7 +300,7 @@ public class ClienteFlotaRMI {
                     break;
                 case ("Nueva Partida"):
                     try {
-                        partida = sj.nuevoServidorPartidas();
+                        partida.nuevaPartida(NUMFILAS, NUMCOLUMNAS, NUMBARCOS);
                     } catch (RemoteException e1) {
                         e1.printStackTrace();
                     }
@@ -355,13 +364,22 @@ public class ClienteFlotaRMI {
             if (quedan > 0 && boton.getBackground().equals(colorDefault)) {
                 int fila = (int) boton.getClientProperty("fila");
                 int columna = (int) boton.getClientProperty("columna");
-                int casilla = partida.pruebaCasilla(fila, columna);
+                int casilla = 0;
+                try {
+                    casilla = partida.pruebaCasilla(fila, columna);
+                } catch (RemoteException e1) {
+                    e1.printStackTrace();
+                }
                 if (casilla == -1)
                     guiTablero.pintaBoton(boton, Color.CYAN);
                 else if (casilla == -2)
                     guiTablero.pintaBoton(boton, Color.ORANGE);
                 else {
-                    guiTablero.pintaBarcoHundido(partida.getBarco(casilla));
+                    try {
+                        guiTablero.pintaBarcoHundido(partida.getBarco(casilla));
+                    } catch (RemoteException e1) {
+                        e1.printStackTrace();
+                    }
                     quedan--;
                 }
                 disparos++;

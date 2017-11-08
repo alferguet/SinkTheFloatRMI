@@ -1,13 +1,16 @@
 package common;
 
-public interface IntServidorPartidasRMI {
+import java.rmi.Remote;
+import java.rmi.RemoteException;
 
-    void nuevaPartida(int f, int c, int b);
+public interface IntServidorPartidasRMI extends Remote {
 
-    int pruebaCasilla(int f, int c);
+    void nuevaPartida(int f, int c, int b) throws RemoteException;
 
-    String getBarco(int idBarco);
+    int pruebaCasilla(int f, int c) throws RemoteException;
 
-    String[] getSolucion();
+    String getBarco(int idBarco) throws RemoteException;
+
+    String[] getSolucion() throws RemoteException;
 
 }

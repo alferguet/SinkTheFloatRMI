@@ -74,5 +74,6 @@ public class ImpServidorJuegoRMI extends UnicastRemoteObject implements IntServi
             listaPartidas.remove(nombreRival);
             return false;
         }
+
     }
 }
