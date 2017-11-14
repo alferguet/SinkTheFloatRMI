@@ -14,7 +14,5 @@ public class ImpCallbackCliente extends UnicastRemoteObject implements IntCallba
 
     public void notify(String message) throws RemoteException{
         System.out.println(message);
-
-
     }
 }
