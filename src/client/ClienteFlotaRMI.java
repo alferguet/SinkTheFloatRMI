@@ -296,7 +296,7 @@ public class ClienteFlotaRMI {
             // realiza accion
             JMenuItem elem = (JMenuItem) e.getSource();
             String texto = elem.getText();
-            switch (texto){
+            switch (texto) {
                 case ("Mostrar Solucion"):
                     guiTablero.muestraSolucion();
                     break;
@@ -314,6 +314,12 @@ public class ClienteFlotaRMI {
                     break;
                 case ("Salir"):
                     guiTablero.liberaRecursos();
+                    input.close();
+                    try {
+                        sj.borraPartida(USERNAME);
+                    } catch (RemoteException e1) {
+                        e1.printStackTrace();
+                    }
                     System.exit(0);
                     break;
             }
@@ -322,19 +328,19 @@ public class ClienteFlotaRMI {
 
     } // end class MenuListener
 
-    private class PartidaListener implements ActionListener{
+    private class PartidaListener implements ActionListener {
 
 
         @Override
         public void actionPerformed(ActionEvent e) {
             JMenuItem elem = (JMenuItem) e.getSource();
             String texto = elem.getText();
-            switch (texto){
+            switch (texto) {
                 case ("Propon Partida"):
                     try {
-                        if(sj.proponPartida(USERNAME,cliente)){
+                        if (sj.proponPartida(USERNAME, cliente)) {
                             System.out.println("Has creado la partida con exito");
-                        } else{
+                        } else {
                             System.out.println("Error en la creacion de la partida");
                         }
                     } catch (RemoteException e1) {
@@ -343,9 +349,9 @@ public class ClienteFlotaRMI {
                     break;
                 case ("Borrar Partida"):
                     try {
-                        if(sj.borraPartida(USERNAME)){
+                        if (sj.borraPartida(USERNAME)) {
                             System.out.println("Has borrado la partida con exito");
-                        } else{
+                        } else {
                             System.out.println("Error en el borrado de la partida");
                         }
                     } catch (RemoteException e1) {
@@ -355,8 +361,13 @@ public class ClienteFlotaRMI {
                 case ("Listar Partidas"):
                     try {
                         String[] partidas = sj.listaPartidas();
-                        for (String partida: partidas) {
-                            System.out.println(partida);
+                        if (partidas.length == 0) {
+                            System.out.println("No hay partidas creadas");
+                            break;
+                        }
+                        System.out.println("Partidas creadas:");
+                        for (String partida : partidas) {
+                            System.out.println("  " + partida);
                         }
                     } catch (RemoteException e1) {
                         e1.printStackTrace();
@@ -366,10 +377,14 @@ public class ClienteFlotaRMI {
                     System.out.println("Escribe el nombre del rival");
                     input.nextLine();
                     String RIVAL = input.next();
+                    if (RIVAL.equals(USERNAME)) {
+                        System.out.println("No puedes aceptar tu propia partida");
+                        break;
+                    }
                     try {
-                        if(sj.aceptaPartida(USERNAME,RIVAL)){
+                        if (sj.aceptaPartida(USERNAME, RIVAL)) {
                             System.out.println("Partida aceptada con exito");
-                        } else{
+                        } else {
                             System.out.println("No se ha podido aceptar la partida");
                         }
                     } catch (RemoteException e1) {
