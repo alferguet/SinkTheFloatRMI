@@ -19,11 +19,11 @@ public class ClienteFlotaRMI {
     public static final int NUMFILAS = 8, NUMCOLUMNAS = 8, NUMBARCOS = 6;
     private String USERNAME;
     private int quedan = NUMBARCOS, disparos = 0;
-    private Scanner input;
     private GuiTablero guiTablero = null;
     private IntServidorPartidasRMI partida = null;
     private IntServidorJuegoRMI sj = null;
     private IntCallbackCliente cliente = null;
+    private Scanner input;
 
     public static void main(String args[]) {
         ClienteFlotaRMI cliente = new ClienteFlotaRMI();
@@ -34,7 +34,7 @@ public class ClienteFlotaRMI {
         try {
             // start a security manager - this is needed if stub
             // downloading is in use for this application.
-            input = new Scanner(System.in);
+
             System.setSecurityManager(new SecurityManager());
             String registryURL = "rmi://localhost:1099/sinkthefloat";
             // find the remote object and cast it to an
@@ -45,6 +45,7 @@ public class ClienteFlotaRMI {
             partida = sj.nuevoServidorPartidas();
             partida.nuevaPartida(NUMFILAS, NUMCOLUMNAS, NUMBARCOS);
             System.out.println("Escriba su nombre de usuario");
+            input = new Scanner(System.in);
             USERNAME = input.next();
             cliente = new ImpCallbackCliente();
             SwingUtilities.invokeLater(() -> {
@@ -340,7 +341,7 @@ public class ClienteFlotaRMI {
                         e1.printStackTrace();
                     }
                     break;
-                case ("Borra partida"):
+                case ("Borrar Partida"):
                     try {
                         if(sj.borraPartida(USERNAME)){
                             System.out.println("Has borrado la partida con exito");
@@ -351,7 +352,7 @@ public class ClienteFlotaRMI {
                         e1.printStackTrace();
                     }
                     break;
-                case ("Listar partidas"):
+                case ("Listar Partidas"):
                     try {
                         String[] partidas = sj.listaPartidas();
                         for (String partida: partidas) {
@@ -361,11 +362,14 @@ public class ClienteFlotaRMI {
                         e1.printStackTrace();
                     }
                     break;
-                case ("Aceptar partida"):
+                case ("Aceptar Partida"):
                     System.out.println("Escribe el nombre del rival");
+                    input.nextLine();
                     String RIVAL = input.next();
                     try {
-                        if(!sj.aceptaPartida(USERNAME,RIVAL)){
+                        if(sj.aceptaPartida(USERNAME,RIVAL)){
+                            System.out.println("Partida aceptada con exito");
+                        } else{
                             System.out.println("No se ha podido aceptar la partida");
                         }
                     } catch (RemoteException e1) {
