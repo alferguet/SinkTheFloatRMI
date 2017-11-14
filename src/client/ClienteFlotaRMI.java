@@ -6,10 +6,12 @@ import java.awt.event.ActionListener;
 import java.rmi.*;
 import java.util.Scanner;
 
+import common.IntCallbackCliente;
 import common.IntServidorJuegoRMI;
 import common.IntServidorPartidasRMI;
 
 import javax.swing.*;
+import javax.xml.transform.sax.SAXSource;
 
 
 public class ClienteFlotaRMI {
@@ -17,10 +19,11 @@ public class ClienteFlotaRMI {
     public static final int NUMFILAS = 8, NUMCOLUMNAS = 8, NUMBARCOS = 6;
     private String USERNAME;
     private int quedan = NUMBARCOS, disparos = 0;
-
+    private Scanner input;
     private GuiTablero guiTablero = null;
     private IntServidorPartidasRMI partida = null;
     private IntServidorJuegoRMI sj = null;
+    private IntCallbackCliente cliente = null;
 
     public static void main(String args[]) {
         ClienteFlotaRMI cliente = new ClienteFlotaRMI();
@@ -31,11 +34,8 @@ public class ClienteFlotaRMI {
         try {
             // start a security manager - this is needed if stub
             // downloading is in use for this application.
-            Scanner input = new Scanner(System.in);
-            System.out.println("Escriba su nombre de usuario");
-            USERNAME = input.next();
+            input = new Scanner(System.in);
             System.setSecurityManager(new SecurityManager());
-
             String registryURL = "rmi://localhost:1099/sinkthefloat";
             // find the remote object and cast it to an
             //   interface object
@@ -44,12 +44,12 @@ public class ClienteFlotaRMI {
             // invoke the remote method
             partida = sj.nuevoServidorPartidas();
             partida.nuevaPartida(NUMFILAS, NUMCOLUMNAS, NUMBARCOS);
-            SwingUtilities.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    guiTablero = new GuiTablero(NUMFILAS, NUMCOLUMNAS);
-                    guiTablero.dibujaTablero();
-                }
+            System.out.println("Escriba su nombre de usuario");
+            USERNAME = input.next();
+            cliente = new ImpCallbackCliente();
+            SwingUtilities.invokeLater(() -> {
+                guiTablero = new GuiTablero(NUMFILAS, NUMCOLUMNAS);
+                guiTablero.dibujaTablero();
             });
         } // end try
         catch (Exception e) {
@@ -80,6 +80,7 @@ public class ClienteFlotaRMI {
          * Dibuja el tablero de juego y crea la partida inicial
          */
         public void dibujaTablero() {
+            frame.setTitle(USERNAME);
             anyadeMenu();
             anyadeMenuPartidas();
             anyadeGrid(numFilas, numColumnas);
@@ -329,13 +330,47 @@ public class ClienteFlotaRMI {
             String texto = elem.getText();
             switch (texto){
                 case ("Propon Partida"):
-
+                    try {
+                        if(sj.proponPartida(USERNAME,cliente)){
+                            System.out.println("Has creado la partida con exito");
+                        } else{
+                            System.out.println("Error en la creacion de la partida");
+                        }
+                    } catch (RemoteException e1) {
+                        e1.printStackTrace();
+                    }
                     break;
-                case ("Nueva Partida"):
-
+                case ("Borra partida"):
+                    try {
+                        if(sj.borraPartida(USERNAME)){
+                            System.out.println("Has borrado la partida con exito");
+                        } else{
+                            System.out.println("Error en el borrado de la partida");
+                        }
+                    } catch (RemoteException e1) {
+                        e1.printStackTrace();
+                    }
                     break;
-                case ("Salir"):
-
+                case ("Listar partidas"):
+                    try {
+                        String[] partidas = sj.listaPartidas();
+                        for (String partida: partidas) {
+                            System.out.println(partida);
+                        }
+                    } catch (RemoteException e1) {
+                        e1.printStackTrace();
+                    }
+                    break;
+                case ("Aceptar partida"):
+                    System.out.println("Escribe el nombre del rival");
+                    String RIVAL = input.next();
+                    try {
+                        if(!sj.aceptaPartida(USERNAME,RIVAL)){
+                            System.out.println("No se ha podido aceptar la partida");
+                        }
+                    } catch (RemoteException e1) {
+                        e1.printStackTrace();
+                    }
                     break;
             }
         }
